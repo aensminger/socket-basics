@@ -13,15 +13,15 @@ io.on('connection', function (socket) {
 	socket.on('message', function (message){	
 		console.log('Message received at server: '+message.text);
 		//send it to every other browser that is connected, except who sent
-		socket.broadcast.emit('message',message);
+		io.emit('message',message);
 
 	});
 
-/*
+
 	socket.emit('message', {
 		text:'Welcome to the chat application!'
 	});
-	*/
+
 })
 
 http.listen(PORT, function () {
