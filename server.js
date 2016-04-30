@@ -8,17 +8,30 @@ var moment= require ('moment');
 
 app.use(express.static(__dirname+'/public'));
 
+var clientInfo = {};
+
 io.on('connection', function (socket) {
 	var now=moment();
 	console.log('User connected via socket.io!');
 
+
+	socket.on('joinRoom', function (req){
+		clientInfo[socket.id] = req;
+		socket.join(req.room);
+		socket.broadcast.to(req.room).emit('message', {
+			name: "System",
+			text: req.name+' has joined!',
+			timestamp : moment().valueOf()
+		})
+	});
+
 	socket.on('message', function (message){	
 		now=moment();
 		console.log('Message received at server: '+message.text);
+
 		//send it to every other browser that is connected, except who sent
 		message.timestamp=now.valueOf();
-
-		io.emit('message',message);
+		io.to(clientInfo[socket.id].room).emit('message',message);
 
 	});
 
